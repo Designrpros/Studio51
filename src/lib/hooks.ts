@@ -1,34 +1,30 @@
-// src/lib/hooks.ts
-'use client';
+import { useState, useEffect } from "react";
+import { configureCloudKit, RecordType } from "@/lib/cloudkit";
 
-import { useState, useEffect } from 'react';
-import { configureCloudKit } from './cloudkit';
-
-export function useCloudKitData(recordType: string = 'Block') {
-  const [records, setRecords] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+export function useCloudKitData(recordType: string) {
+  const [data, setData] = useState<RecordType[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
+        setLoading(true);
         const container = await configureCloudKit();
-        console.log('Hook Container:', container);
-        const response = await container.publicCloudDatabase.performQuery({
-          recordType,
-        });
-        console.log('Query Response:', response);
-        console.log('Records:', response.records);
-        setRecords(response.records);
-      } catch (err) {
-        console.error('CloudKit Fetch Error:', err);
-        setError('Failed to load data: ' + (err instanceof Error ? err.message : String(err)));
+        const query = { recordType };
+        const response = await container.publicCloudDatabase.fetchRecords(query);
+        setData(response.records);
+        setError(null);
+      } catch (err: unknown) {
+        setError("Failed to fetch data.");
+        console.error("CloudKit fetch error:", err);
       } finally {
         setLoading(false);
       }
-    }
+    };
+
     fetchData();
   }, [recordType]);
 
-  return { records, loading, error };
+  return { data, error, loading };
 }

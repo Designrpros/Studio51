@@ -1,4 +1,4 @@
-import { Container, AuthResponse } from '@/types/cloudkit-types';
+import { Container, AuthResponse, CloudKitConfig } from '@/types/cloudkit-types';
 
 let cachedContainer: Container | null = null;
 
@@ -21,7 +21,7 @@ export async function configureCloudKit(): Promise<Container> {
   }
 
   if (!cachedContainer) {
-    const config = {
+    const config: CloudKitConfig = {
       containers: [
         {
           containerIdentifier: 'iCloud.Studio51',
@@ -40,7 +40,7 @@ export async function configureCloudKit(): Promise<Container> {
           environment: 'development',
         },
       ],
-    } as any;
+    };
 
     try {
       const cloudKitInstance = window.CloudKit.configure(config);
@@ -105,9 +105,9 @@ export async function uploadTrack(title: string, artist: string, file: File): Pr
     const record = {
       recordType: 'Track',
       fields: {
-        title: { value: title },
-        artist: { value: artist },
-        audioAsset: { value: file },
+        title,
+        artist,
+        audioAsset: file,
       },
     };
     await container.publicCloudDatabase.saveRecord(record);
@@ -118,4 +118,4 @@ export async function uploadTrack(title: string, artist: string, file: File): Pr
   }
 }
 
-export type { AuthResponse, Container } from '@/types/cloudkit-types';
+export type { AuthResponse, Container, RecordType } from '@/types/cloudkit-types';

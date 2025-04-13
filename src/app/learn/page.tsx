@@ -4,8 +4,6 @@
 import styled from "styled-components";
 import Link from "next/link";
 import Image from "next/image";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 // Global box-sizing reset
 const GlobalStyle = styled.div`
@@ -48,36 +46,6 @@ const SectionTitle = styled.h2`
   text-transform: uppercase;
 
   @media (max-width: 768px) {
-    margin-bottom: 1.5rem;
-  }
-`;
-
-const IntroText = styled.div`
-  font-size: clamp(0.875rem, 3vw, 1.25rem);
-  color: ${({ theme }) => theme.colors.textLight};
-  line-height: 1.8;
-  margin-bottom: 2rem;
-  text-align: left;
-  width: 100%; /* Full width of container */
-  max-width: 100%; /* Prevent exceeding container */
-  overflow-x: hidden; /* Clip any overflow */
-  overflow-wrap: break-word; /* Break long words */
-  word-break: break-word; /* Ensure word breaking */
-  white-space: normal; /* Force wrapping */
-
-  & > p {
-    margin: 0 0 1rem 0;
-    width: 100%;
-    max-width: 100%;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    white-space: normal;
-  }
-
-  @media (max-width: 768px) {
-    line-height: 1.6;
-  }
-  @media (max-width: 480px) {
     margin-bottom: 1.5rem;
   }
 `;
@@ -185,36 +153,6 @@ const ResourceLink = styled(Link)`
   }
   @media (max-width: 480px) {
     padding: 0.3rem 0.6rem;
-  }
-`;
-
-const AdditionalText = styled.div`
-  font-size: clamp(0.875rem, 3vw, 1.25rem);
-  color: ${({ theme }) => theme.colors.textLight};
-  line-height: 1.8;
-  margin-top: 2rem;
-  text-align: left;
-  width: 100%; /* Full width of container */
-  max-width: 100%; /* Prevent exceeding container */
-  overflow-x: hidden; /* Clip any overflow */
-  overflow-wrap: break-word; /* Break long words */
-  word-break: break-word; /* Ensure word breaking */
-  white-space: normal; /* Force wrapping */
-
-  & > p {
-    margin: 0 0 1rem 0;
-    width: 100%;
-    max-width: 100%;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    white-space: normal;
-  }
-
-  @media (max-width: 768px) {
-    line-height: 1.6;
-  }
-  @media (max-width: 480px) {
-    margin-top: 1.5rem;
   }
 `;
 

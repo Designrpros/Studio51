@@ -103,7 +103,7 @@ export default function Login() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(true);
-  const [isLightMode, setIsLightMode] = useState(true);
+  const [isLightMode] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in

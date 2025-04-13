@@ -97,7 +97,7 @@ export default function MusicUploads() {
       await uploadTrack(title, artist, file);
       setUploadSuccess("Track uploaded successfully!");
       e.currentTarget.reset();
-    } catch (err: unknown) {
+    } catch {
       setUploadError("Failed to upload track. Please try again.");
     }
   };

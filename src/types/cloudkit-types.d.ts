@@ -21,10 +21,15 @@ export interface ApiTokenAuth {
     containers: ContainerConfig[];
   }
   
+  export interface RecordType {
+    recordType: string;
+    fields: Record<string, string | number | File | null>;
+  }
+  
   export interface Database {
-    performQuery(query: { recordType: string }): Promise<{ records: any[] }>;
-    fetchRecords(query: { recordType: string }): Promise<{ records: any[] }>;
-    saveRecord(record: { recordType: string; fields: Record<string, any> }): Promise<any>;
+    performQuery(query: { recordType: string }): Promise<{ records: RecordType[] }>;
+    fetchRecords(query: { recordType: string }): Promise<{ records: RecordType[] }>;
+    saveRecord(record: { recordType: string; fields: Record<string, string | number | File | null> }): Promise<RecordType>;
   }
   
   export interface AuthResponse {

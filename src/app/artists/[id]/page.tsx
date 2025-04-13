@@ -1,4 +1,3 @@
-// src/app/artists/[id]/page.tsx
 "use client";
 
 import styled from "styled-components";
@@ -82,8 +81,8 @@ export default function ArtistDetail() {
 
   // Convert id to a number and validate
   const artistId = typeof id === "string" ? parseInt(id, 10) : NaN;
-  const validKeys = Object.keys(artistsData).map(Number) as (1 | 2 | 3 | 4 | 5)[];
-  const artist = validKeys.includes(artistId as any)
+  const validKeys = Object.keys(artistsData).map(Number) as number[];
+  const artist = validKeys.includes(artistId as keyof typeof artistsData)
     ? artistsData[artistId as keyof typeof artistsData]
     : { name: "Artist Not Found", description: "No details available for this artist." };
 

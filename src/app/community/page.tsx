@@ -2,8 +2,6 @@
 "use client";
 
 import styled from "styled-components";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import Link from 'next/link';
 
 // Styled Components

@@ -5,11 +5,12 @@ import styled, { keyframes } from "styled-components";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
+// Nøkkelord for skrivemaskin-effekten er oversatt
 const typeWriter = keyframes`
-  0%, 20% { content: "Music"; }
-  25%, 40% { content: "Community"; }
-  45%, 60% { content: "Recovery"; }
-  65%, 80% { content: "Creativity"; }
+  0%, 20% { content: "Musikk"; }
+  25%, 40% { content: "Fellesskap"; }
+  45%, 60% { content: "Mestring"; }
+  65%, 80% { content: "Kreativitet"; }
   85%, 100% { content: "Studio 51"; }
 `;
 
@@ -93,7 +94,7 @@ const HeroSubText = styled.p`
   margin-top: 1rem;
 
   &::after {
-    content: "Music";
+    content: "Musikk"; // Startverdi for animasjonen
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
@@ -242,7 +243,7 @@ export default function Home() {
         <HeroBackground>
           <Image
             src={isLightMode ? "/MusicCircleWhite.png" : "/MusicCircle.png"}
-            alt="Studio 51 Music Circle"
+            alt="Studio 51 Musikksirkel"
             width={1500}
             height={1500}
             style={{
@@ -276,50 +277,36 @@ export default function Home() {
 
       <ContentContainer>
         <Section>
-          <SectionTitle>What is Studio 51?</SectionTitle>
+          <SectionTitle>Hva er Studio 51?</SectionTitle>
           <SectionText>
-            Rap Clinic & Studio 51 is a vibrant community in Sandvika, Norway,
-            dedicated to supporting individuals with mental health and substance
-            abuse challenges through music and creative expression. Founded in
-            2016, we provide a safe space to create, connect, and heal, using
-            hip-hop, music production, and other arts as tools for recovery and
-            growth.
+            Rap Clinic & Studio 51 er et levende fellesskap i Sandvika, dedikert til å støtte enkeltpersoner med utfordringer innen psykisk helse og rus gjennom musikk og kreative uttrykk. Etablert i 2016, tilbyr vi et trygt sted for å skape, knytte bånd og finne helbredelse, ved å bruke hip-hop, musikkproduksjon og andre kunstformer som verktøy for mestring og vekst.
           </SectionText>
         </Section>
 
         <Section>
-          <SectionTitle>What We Offer</SectionTitle>
+          <SectionTitle>Hva Vi Tilbyr</SectionTitle>
           <SectionText>
-            Our programs empower members to explore their creativity, build
-            confidence, and foster positive routines. Here’s what you can
-            experience at Studio 51:
+            Våre programmer gir medlemmene mulighet til å utforske sin kreativitet, bygge selvtillit og skape positive rutiner. Her er noe av det du kan oppleve hos Studio 51:
           </SectionText>
           <SectionList>
             <ListItem>
-              <strong>Music Production</strong>: Write lyrics, produce tracks, and
-              release music on platforms like Spotify and SoundCloud under our
-              Studio 51 label.
+              <strong>Musikkproduksjon</strong>: Skriv tekster, produser låter og gi ut musikk på plattformer som Spotify og SoundCloud under vårt eget Studio 51-label.
             </ListItem>
             <ListItem>
-              <strong>Creative Workshops</strong>: Engage in animation, video
-              production, podcasting, and gaming to express yourself in new ways.
+              <strong>Kreative Verksteder</strong>: Delta i animasjon, videoproduksjon, podcasting og gaming for å uttrykke deg på nye måter.
             </ListItem>
             <ListItem>
-              <strong>Community Support</strong>: Join over 50 members in a
-              welcoming environment that promotes connection and collaboration.
+              <strong>Fellesskap og Støtte</strong>: Bli en del av over 50 medlemmer i et inkluderende miljø som fremmer samhold og samarbeid.
             </ListItem>
             <ListItem>
-              <strong>Work Training</strong>: Develop skills and routines through
-              hands-on projects, with opportunities to lead groups.
+              <strong>Arbeidstrening</strong>: Utvikle ferdigheter og rutiner gjennom praktiske prosjekter, med muligheter for å lede grupper.
             </ListItem>
             <ListItem>
-              <strong>Live Events</strong>: Perform at local events or share your
-              work with the community, boosting confidence and visibility.
+              <strong>Live-arrangementer</strong>: Opptre på lokale arrangementer eller del arbeidet ditt med fellesskapet for å bygge selvtillit og synlighet.
             </ListItem>
           </SectionList>
           <SectionText>
-            Ready to make music and make a difference? <strong>Studio 51</strong>{" "}
-            is here to support your journey.
+            Klar til å skape musikk og en forskjell? <strong>Studio 51</strong> er her for å støtte deg på reisen.
           </SectionText>
         </Section>
       </ContentContainer>

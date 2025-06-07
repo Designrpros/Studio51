@@ -4,11 +4,9 @@
 import styled from "styled-components";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
 
-// Styled Components
+// Styled Components (hentet fra det nye 'learn'-designet)
 const PageContainer = styled.div`
   width: 100%;
   min-height: 100vh;
@@ -20,7 +18,7 @@ const PageContainer = styled.div`
 const ContentContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 4rem 2rem; /* Increased padding to offset Toolbar */
+  padding: 4rem 2rem;
   position: relative;
   z-index: 1;
 
@@ -29,8 +27,23 @@ const ContentContainer = styled.div`
   }
 `;
 
+const MainTitle = styled.h1`
+  font-size: 3rem;
+  font-weight: 800;
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+`;
+
+const MainParagraph = styled.p`
+  font-size: 1.25rem;
+  line-height: 1.8;
+  max-width: 800px;
+  margin-bottom: 4rem;
+`;
+
 const Section = styled.section`
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 `;
 
 const SectionTitle = styled.h2`
@@ -40,60 +53,84 @@ const SectionTitle = styled.h2`
   margin-bottom: 1rem;
   border-bottom: 2px solid ${({ theme }) => theme.colors.primary};
   padding-bottom: 0.5rem;
-  text-transform: uppercase;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
 `;
 
 const LargeText = styled.div`
   font-size: 1.25rem;
   color: ${({ theme }) => theme.colors.textLight};
   line-height: 1.8;
-  margin-bottom: 1.5rem;
-
-  & > p {
-    margin: 0;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
+  margin-bottom: 2.5rem;
 `;
 
-// TopicCard Component
-const Card = styled.div<{ $isOpen: boolean }>`
+const TopicContainer = styled.div`
+  margin-bottom: 2.5rem;
+`;
+
+const TopicSubtitle = styled.h3`
+  font-size: 2rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.textLight};
+  margin-bottom: 0.75rem;
+`;
+
+const TopicParagraph = styled.p`
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: ${({ theme }) => theme.colors.textLight};
+  margin-bottom: 1.5rem;
+`;
+
+const Card = styled.div`
   background: ${({ theme }) => theme.colors.backgroundContent};
   border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.backgroundContent};
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.backgroundLight};
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 `;
 
-const CardTitle = styled.h3`
-  font-size: 1.5rem;
+const CardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+`;
+
+const CardTitle = styled.h4`
+  font-size: 1.25rem;
   font-weight: 600;
   margin: 0;
   color: ${({ theme }) => theme.colors.primary};
+`;
+
+const ChevronIcon = styled.span<{ $isOpen: boolean }>`
+  font-size: 1.5rem;
+  transition: transform 0.3s ease-in-out;
+  transform: ${({ $isOpen }) => ($isOpen ? 'rotate(90deg)' : 'rotate(0deg)')};
 `;
 
 const CardDescription = styled.div<{ $isOpen: boolean }>`
   font-size: 1rem;
   color: ${({ theme }) => theme.colors.textLight};
   line-height: 1.6;
-  margin-top: ${({ $isOpen }) => ($isOpen ? "1rem" : "0")};
   max-height: ${({ $isOpen }) => ($isOpen ? "1000px" : "0")};
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: padding 0.3s ease, max-height 0.3s ease;
+  white-space: pre-wrap;
+  padding: ${({ $isOpen }) => ($isOpen ? '0 1.5rem 1.5rem 1.5rem' : '0 1.5rem')};
 
-  & > p {
-    margin: 0;
+  & a {
+    color: ${({ theme }) => theme.colors.primary};
+    text-decoration: none;
+    font-weight: bold;
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 
@@ -104,37 +141,13 @@ const TopicCard: React.FC<{
   onToggle: () => void;
 }> = ({ title, description, isOpen, onToggle }) => {
   return (
-    <Card $isOpen={isOpen} onClick={onToggle}>
-      <CardTitle>{title}</CardTitle>
+    <Card onClick={onToggle}>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <ChevronIcon $isOpen={isOpen}>▶</ChevronIcon>
+      </CardHeader>
       <CardDescription $isOpen={isOpen}>
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          components={{
-            code({className, children, ...props }) {
-              const match = /language-(\w+)/.exec(className || "");
-              return match ? (
-                <SyntaxHighlighter
-                  language={match[1]}
-                  style={vscDarkPlus}
-                  customStyle={{
-                    marginTop: "1rem",
-                    borderRadius: "4px",
-                    padding: "1rem",
-                    backgroundColor: "#1e1e1e",
-                  }}
-                >
-                  {String(children).replace(/\n$/, "")}
-                </SyntaxHighlighter>
-              ) : (
-                <code className={className} {...props}>
-                  {children}
-                </code>
-              );
-            },
-          }}
-        >
-          {description}
-        </ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{description}</ReactMarkdown>
       </CardDescription>
     </Card>
   );
@@ -151,46 +164,64 @@ export default function Projects() {
     }));
   };
 
-  const sections = [
+  const projectSections = [
     {
-      title: "Music Releases",
-      largeText:
-        "Studio 51 empowers its members to create and release music under our label, available on platforms like Spotify and SoundCloud. Explore some of our standout projects below.",
+      sectionTitle: "Offisielle Kanaler",
+      sectionParagraph: "Dette er de sentrale knutepunktene for Rap Clinic og Studio 51. Her finner du den mest oppdaterte informasjonen, presseklipp og direkte kontaktinfo.",
       topics: [
         {
-          title: "Prima",
-          description:
-            "A powerful hip-hop single by one of our founding artists, showcasing raw emotion and lyrical depth. Recorded at Studio 51’s Villa Walle basement in 2018.\n\nListen on SoundCloud:\n\n```html\n<iframe width=\"100%\" height=\"166\" scrolling=\"no\" frameborder=\"no\" allow=\"autoplay\" src=\"https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/123456789&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true\"></iframe>\n```\n(Replace with real SoundCloud embed URL)",
+          subtitle: "RapClinic.no",
+          visible_description: "Vår offisielle nettside er hjertet av vår digitale tilstedeværelse. Utforsk vår historie, lær om våre tjenester, og se hvordan du kan støtte vårt arbeid.",
+          toggle_title: "Besøk Nettsiden",
+          toggled_content: "[Gå til rapclinic.no](https://rapclinic.no/)",
         },
         {
-          title: "Echoes of Recovery",
-          description:
-            "An album collaboration from 2021, blending hip-hop and electronic beats. Produced at our Smia facility in Stabekk.\n\nStream it here:\n\n```html\n<iframe width=\"100%\" height=\"166\" scrolling=\"no\" frameborder=\"no\" allow=\"autoplay\" src=\"https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/987654321&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true\"></iframe>\n```\n(Replace with real SoundCloud embed URL)",
-        },
-        {
-          title: "Freestyle Fridays",
-          description:
-            "A series of live freestyle recordings from our weekly sessions. Captures the raw energy of Studio 51’s community.\n\nCheck out a sample:\n\n```html\n<iframe width=\"100%\" height=\"166\" scrolling=\"no\" frameborder=\"no\" allow=\"autoplay\" src=\"https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/456789123&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true\"></iframe>\n```\n(Replace with real SoundCloud embed URL)",
+          subtitle: "Nyhetsartikler",
+          visible_description: "Les hva media skriver om oss. Disse artiklene gir et dypere innblikk i vår påvirkning i lokalsamfunnet og historiene til våre medlemmer.",
+          toggle_title: "Les Artikler",
+          toggled_content: "* **Bærum Kommune:** [Et Kreativt Fristed](https://www.baerum.kommune.no/aktuelt/et-kreativt-fristed-for-rusavhengige/)\n* **Budstikka:** [Huset Som Musikken Bygget](https://www.budstikka.no/rus-og-psykiatri/musikk/sandvika/huset-som-musikken-bygget/520261!/)",
         },
       ],
     },
     {
-      title: "Creative Works",
+      sectionTitle: "Musikk & Video",
+      sectionParagraph: "Musikk er kjernen i alt vi gjør. Utforsk de kreative verkene fra våre artister på YouTube og Spotify, fra musikkvideoer og singler til podcaster og samlealbum.",
       topics: [
         {
-          title: "Animation Short: ‘Rhythm of Resilience’",
-          description:
-            "A 3-minute animation created by Studio 51 members in 2022, depicting a journey of recovery through music.\n\nWatch it on YouTube:\n\n```html\n<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/VIDEO_ID\" title=\"Rhythm of Resilience\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>\n```\n(Replace VIDEO_ID with actual YouTube ID)",
+          subtitle: "YouTube",
+          visible_description: "Vår YouTube-kanal er et visuelt galleri for medlemmenes kreativitet. Her finner du offisielle musikkvideoer, låter og innhold fra studio-hverdagen.",
+          toggle_title: "Se på YouTube",
+          toggled_content: "* **Hovedkanal:** [Besøk Rap Clinic på YouTube](https://www.youtube.com/@rapclinicstudio5175)\n* **Musikkvideo:** [GAMMAL MA$A - 'HJERTESORG'](https://www.youtube.com/watch?v=D-A7y3NzqKk)",
         },
         {
-          title: "Podcast: ‘Beats & Stories’",
-          description:
-            "A monthly podcast featuring Studio 51 artists sharing their creative process and recovery stories.\n\nListen to Episode 1:\n\n```html\n<iframe src=\"https://open.spotify.com/embed/episode/EPISODE_ID?utm_source=generator\" width=\"100%\" height=\"152\" frameBorder=\"0\" allowfullscreen=\"\" allow=\"autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture\"></iframe>\n```\n(Replace EPISODE_ID with actual Spotify episode ID)",
+          subtitle: "Spotify",
+          visible_description: "Gjennom labelet Studio 51 produserer og utgir våre medlemmer egen musikk. Lytt til deres historier, følg oss for nye utgivelser, og hør på vår podcast.",
+          toggle_title: "Lytt på Spotify",
+          toggled_content: "* **Artistprofil:** [Følg Studio 51](https://open.spotify.com/artist/0Vp8nF2M1kOYp3a8gX2Haa)\n* **Podcast:** [Studio 51-podden](https://open.spotify.com/show/5J0aL9uB9iG4oO7G4a8gH9)\n* **Album:** [Kompilasjon 2022](https://open.spotify.com/album/43ko3y5fGdoL55B5aYrtwM)",
+        },
+      ],
+    },
+    {
+      sectionTitle: "Sosiale Medier",
+      sectionParagraph: "Følg oss i hverdagen for å få et innblikk i vårt fellesskap og kreative prosesser. Her deler vi øyeblikk bak kulissene, kunngjøringer og ufiltrert kreativitet.",
+      topics: [
+        {
+          subtitle: "Instagram",
+          visible_description: "Instagram er der du får de ferskeste oppdateringene. Se bilder og videoer fra sessions, arrangementer og dagliglivet på huset.",
+          toggle_title: "Følg @rap_klinikken",
+          toggled_content: "[Besøk vår Instagram-profil](https://www.instagram.com/rap_klinikken/)",
         },
         {
-          title: "Gaming Project: ‘Soundscape’",
-          description:
-            "An experimental game prototype where players create music to progress, developed during a 2023 workshop.\n\nMore details coming soon!",
+          subtitle: "Facebook",
+          visible_description: "Bli med i vårt Facebook-fellesskap for å koble deg til den større Studio 51-familien, motta invitasjoner til arrangementer og delta i samtalen.",
+          toggle_title: "Besøk vår Facebook-side",
+          toggled_content: "[Gå til Facebook](https://www.facebook.com/rapklinikken/)",
+        },
+        {
+          subtitle: "SoundCloud",
+          visible_description: "Vår SoundCloud er lekeplassen for rå, ufiltrert kreativitet. Lytt til demoer, uferdige spor og spontane opptak fra våre sessions.",
+          toggle_title: "Lytt på SoundCloud",
+          toggled_content: "[Utforsk vår SoundCloud](https://soundcloud.com/user-725912429)",
         },
       ],
     },
@@ -199,26 +230,31 @@ export default function Projects() {
   return (
     <PageContainer>
       <ContentContainer>
-        {sections.map((section, sectionIndex) => (
+        <MainTitle>Media & Plattformer</MainTitle>
+        <MainParagraph>
+          Oppdag de ulike plattformene hvor Rap Clinic og Studio 51 deler sitt arbeid, sine historier og sin musikk. Her finner du alt fra offisielle utgivelser og nyhetsartikler til våre kanaler i sosiale medier.
+        </MainParagraph>
+
+        {projectSections.map((section, sectionIndex) => (
           <Section key={sectionIndex}>
-            <SectionTitle>{section.title}</SectionTitle>
-            {section.largeText && (
-              <LargeText>
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {section.largeText}
-                </ReactMarkdown>
-              </LargeText>
-            )}
+            <SectionTitle>{section.sectionTitle}</SectionTitle>
+            <LargeText>
+              <ReactMarkdown>{section.sectionParagraph}</ReactMarkdown>
+            </LargeText>
+
             {section.topics.map((topic, topicIndex) => {
               const globalIndex = sectionIndex * 100 + topicIndex;
               return (
-                <TopicCard
-                  key={globalIndex}
-                  title={topic.title}
-                  description={topic.description}
-                  isOpen={!!openTopics[globalIndex]}
-                  onToggle={() => toggleTopic(globalIndex)}
-                />
+                <TopicContainer key={globalIndex}>
+                  <TopicSubtitle>{topic.subtitle}</TopicSubtitle>
+                  <TopicParagraph>{topic.visible_description}</TopicParagraph>
+                  <TopicCard
+                    title={topic.toggle_title}
+                    description={topic.toggled_content}
+                    isOpen={!!openTopics[globalIndex]}
+                    onToggle={() => toggleTopic(globalIndex)}
+                  />
+                </TopicContainer>
               );
             })}
           </Section>

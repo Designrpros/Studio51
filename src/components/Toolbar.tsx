@@ -1,3 +1,4 @@
+// src/components/Toolbar.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,19 +7,32 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOutCloudKit } from "@/lib/cloudkit";
 
-const ToolbarContainer = styled.nav`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: ${({ theme }) => theme.colors.backgroundDark};
+// Data arrays for easier maintenance
+const mainNavLinks = [
+  { href: "/artists", label: "Artists" },
+  { href: "/media", label: "Media" },
+  { href: "/community", label: "Community" },
+  { href: "/learn", label: "Learn" },
+  { href: "/contact", label: "Contact" },
+];
+
+const adminNavLinks = [
+  { href: "/admin/dashboard", label: "Dashboard" },
+  { href: "/admin/calendar", label: "Calendar" },
+  { href: "/admin/employees", label: "Employees" },
+  { href: "/admin/music-uploads", label: "Music Uploads" },
+  { href: "/admin/manage", label: "Manage" },
+];
+
+// Styled Components
+const ToolbarContainer = styled.header`
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000;
-  box-sizing: border-box;
+  z-index: 1001;
+  background-color: ${({ theme }) => theme.colors.backgroundDark};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease;
 `;
 
 const MainToolbar = styled.div`
@@ -28,26 +42,27 @@ const MainToolbar = styled.div`
   padding: 0.75rem 2rem;
   width: 100%;
   max-width: 1200px;
-  min-height: 48px;
+  min-height: 50px;
+  margin: 0 auto;
+
+  @media (max-width: 480px) {
+    padding: 0.75rem 1rem;
+  }
 `;
 
 const AdminNav = styled.div<{ $isVisible: boolean }>`
   display: ${({ $isVisible }) => ($isVisible ? "flex" : "none")};
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.25rem 2.5rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 0.75rem 2.5rem;
   background-color: ${({ theme }) => theme.colors.backgroundContent};
   width: 100%;
   border-top: 1px solid ${({ theme }) => theme.colors.textLight}20;
-
-  @media (max-width: 768px) {
-    gap: 0.5rem;
-    padding: 0.25rem 1.5rem;
-  }
 `;
 
 const AdminNavLink = styled(Link)`
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.textLight};
   text-decoration: none;
@@ -57,10 +72,6 @@ const AdminNavLink = styled(Link)`
   &:hover {
     color: ${({ theme }) => theme.colors.accent};
   }
-
-  @media (max-width: 768px) {
-    font-size: 0.8rem;
-  }
 `;
 
 const Logo = styled(Link)`
@@ -68,24 +79,14 @@ const Logo = styled(Link)`
   font-weight: 700;
   color: ${({ theme }) => theme.colors.textDark};
   text-decoration: none;
-  transition: color 0.3s ease;
   font-family: "Montserrat", sans-serif;
-  margin-right: 1rem;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.accent};
-  }
-
-  @media (max-width: 800px) {
-    font-size: 1.5rem;
-  }
 `;
 
 const NavLinks = styled.div`
   display: flex;
   gap: 1.25rem;
   align-items: center;
-  margin-left: 1rem;
+  margin-left: auto;
 
   @media (max-width: 800px) {
     display: none;
@@ -103,18 +104,18 @@ const NavLink = styled(Link)`
   &:hover {
     color: ${({ theme }) => theme.colors.accent};
   }
-
-  @media (max-width: 800px) {
-    font-size: 1rem;
-  }
 `;
 
-const BurgerIcon = styled.div<{ $isOpen: boolean }>`
+// FIX: Changed to use a transient prop '$isOpen' to avoid the TypeScript error
+const BurgerIcon = styled.button<{ $isOpen: boolean }>`
   display: none;
   flex-direction: column;
   gap: 4px;
   cursor: pointer;
   padding: 0.5rem;
+  background: none;
+  border: none;
+  z-index: 1002;
 
   @media (max-width: 800px) {
     display: flex;
@@ -131,32 +132,30 @@ const BurgerIcon = styled.div<{ $isOpen: boolean }>`
   ${({ $isOpen }) =>
     $isOpen &&
     `
-    div:nth-child(1) {
-      transform: rotate(45deg) translate(4px, 4px);
-    }
-    div:nth-child(2) {
-      opacity: 0;
-    }
-    div:nth-child(3) {
-      transform: rotate(-45deg) translate(5px, -5px);
-    }
+    div { background-color: #fff; }
+    div:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+    div:nth-child(2) { opacity: 0; }
+    div:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
   `}
 `;
 
-const MobileMenu = styled.div<{ $isOpen: boolean }>`
-  display: ${({ $isOpen }) => ($isOpen ? "flex" : "none")};
+const MobileMenu = styled.div<{ $isOpen: boolean; }>`
+  display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   position: fixed;
-  top: 48px;
+  top: 0;
   left: 0;
   width: 100%;
-  background: ${({ theme }) => theme.colors.backgroundContent};
-  padding: 1.25rem 0;
-  z-index: 999;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  transform: ${({ $isOpen }) => ($isOpen ? "translateY(0)" : "translateY(-10px)")};
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 100vh;
+  background: ${({ theme }) => theme.colors.backgroundDark};
+  z-index: 1000;
+  overflow-y: auto;
+  
+  opacity: ${({ $isOpen }) => ($isOpen ? "1" : "0")};
+  pointer-events: ${({ $isOpen }) => ($isOpen ? "auto" : "none")};
+  transition: opacity 0.35s ease;
 
   @media (min-width: 801px) {
     display: none;
@@ -164,20 +163,31 @@ const MobileMenu = styled.div<{ $isOpen: boolean }>`
 `;
 
 const MobileNavLink = styled(Link)`
-  font-size: 1.3rem;
+  font-size: 2rem;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.textLight};
+  color: #fff;
   text-decoration: none;
-  padding: 0.75rem;
+  padding: 1rem;
   width: 100%;
   text-align: center;
-  transition: color 0.3s ease, background-color 0.3s ease;
-  font-family: "Montserrat", sans-serif;
+  transition: color 0.3s ease, letter-spacing 0.3s ease;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.accent};
-    background-color: ${({ theme }) => theme.colors.backgroundLight};
+    color: ${({ theme }) => theme.colors.primary};
+    letter-spacing: 1px;
   }
+`;
+
+const MobileAdminHeader = styled.div`
+  font-size: 1rem;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.primary};
+  text-transform: uppercase;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid ${({ theme }) => theme.colors.textLight}30;
+  width: 80%;
+  text-align: center;
 `;
 
 export default function Toolbar() {
@@ -187,23 +197,26 @@ export default function Toolbar() {
   const isAdminPage = pathname.startsWith('/admin');
 
   useEffect(() => {
-    // Check login status
     const user = localStorage.getItem("studio51_user");
-    if (user) {
-      setIsLoggedIn(true);
-    }
+    setIsLoggedIn(!!user);
   }, []);
+  
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : 'auto';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isOpen]);
 
-  const toggleMenu = () => {
-    setIsOpen((prev) => !prev);
-  };
+  const toggleMenu = () => setIsOpen(prev => !prev);
+  const closeMenu = () => setIsOpen(false);
 
   const handleSignOut = async () => {
     try {
       await signOutCloudKit();
       localStorage.removeItem("studio51_user");
       setIsLoggedIn(false);
-      setIsOpen(false);
+      closeMenu();
     } catch (err: unknown) {
       console.error("Sign-out error:", err);
     }
@@ -215,72 +228,29 @@ export default function Toolbar() {
         <MainToolbar>
           <Logo href="/">Studio 51</Logo>
           <NavLinks>
-            <NavLink href="/artists">Artists</NavLink>
-            <NavLink href="/media">Media</NavLink>
-            <NavLink href="/community">Community</NavLink>
-            <NavLink href="/learn">Learn</NavLink>
-            <NavLink href="/contact">Contact</NavLink>
+            {mainNavLinks.map(link => <NavLink key={link.href} href={link.href}>{link.label}</NavLink>)}
             {isLoggedIn && <NavLink href="/admin/dashboard">Admin</NavLink>}
-            <NavLink href="/login" onClick={isLoggedIn ? handleSignOut : undefined}>
-              {isLoggedIn ? "Log out" : "Log in"}
-            </NavLink>
+            <NavLink href="/login" onClick={isLoggedIn ? handleSignOut : undefined}>{isLoggedIn ? "Log out" : "Log in"}</NavLink>
           </NavLinks>
-          <BurgerIcon $isOpen={isOpen} onClick={toggleMenu}>
-            <div></div>
-            <div></div>
-            <div></div>
+          {/* FIX: Passing '$isOpen' prop instead of 'data-is-open' */}
+          <BurgerIcon $isOpen={isOpen} onClick={toggleMenu} aria-label="Toggle menu">
+            <div /><div /><div />
           </BurgerIcon>
         </MainToolbar>
         <AdminNav $isVisible={isAdminPage}>
-          <AdminNavLink href="/admin/dashboard">Dashboard</AdminNavLink>
-          <AdminNavLink href="/admin/calendar">Calendar</AdminNavLink>
-          <AdminNavLink href="/admin/employees">Employees</AdminNavLink>
-          <AdminNavLink href="/admin/music-uploads">Music Uploads</AdminNavLink>
-          <AdminNavLink href="/admin/manage">Manage</AdminNavLink>
+          {adminNavLinks.map(link => <AdminNavLink key={link.href} href={link.href}>{link.label}</AdminNavLink>)}
         </AdminNav>
       </ToolbarContainer>
+      
       <MobileMenu $isOpen={isOpen}>
-        <MobileNavLink href="/artists" onClick={toggleMenu}>
-          Artists
-        </MobileNavLink>
-        <MobileNavLink href="/media" onClick={toggleMenu}>
-          Media
-        </MobileNavLink>
-        <MobileNavLink href="/community" onClick={toggleMenu}>
-          Community
-        </MobileNavLink>
-        <MobileNavLink href="/learn" onClick={toggleMenu}>
-          Learn
-        </MobileNavLink>
-        <MobileNavLink href="/contact" onClick={toggleMenu}>
-          Contact
-        </MobileNavLink>
+        {mainNavLinks.map(link => <MobileNavLink key={link.href} href={link.href} onClick={closeMenu}>{link.label}</MobileNavLink>)}
         {isLoggedIn && (
           <>
-            <MobileNavLink href="/admin/dashboard" onClick={toggleMenu}>
-              Admin Dashboard
-            </MobileNavLink>
-            <MobileNavLink href="/admin/calendar" onClick={toggleMenu}>
-              Admin Calendar
-            </MobileNavLink>
-            <MobileNavLink href="/admin/employees" onClick={toggleMenu}>
-              Admin Employees
-            </MobileNavLink>
-            <MobileNavLink href="/admin/music-uploads" onClick={toggleMenu}>
-              Admin Music Uploads
-            </MobileNavLink>
-            <MobileNavLink href="/admin/manage" onClick={toggleMenu}>
-              Admin Manage
-            </MobileNavLink>
+            <MobileAdminHeader>Admin Panel</MobileAdminHeader>
+            {adminNavLinks.map(link => <MobileNavLink key={link.href} href={link.href} onClick={closeMenu}>{link.label}</MobileNavLink>)}
           </>
         )}
-        <MobileNavLink
-          href="/login"
-          onClick={() => {
-            if (isLoggedIn) handleSignOut();
-            else toggleMenu();
-          }}
-        >
+        <MobileNavLink href="/login" onClick={isLoggedIn ? handleSignOut : closeMenu}>
           {isLoggedIn ? "Log out" : "Log in"}
         </MobileNavLink>
       </MobileMenu>

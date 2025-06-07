@@ -2,9 +2,9 @@
 "use client";
 
 import styled from "styled-components";
-import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Link from 'next/link';
 
 // Styled Components
 const PageContainer = styled.div`
@@ -18,7 +18,7 @@ const PageContainer = styled.div`
 const ContentContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 4rem 2rem; /* Offset Toolbar */
+  padding: 4rem 2rem;
   position: relative;
   z-index: 1;
 
@@ -27,8 +27,23 @@ const ContentContainer = styled.div`
   }
 `;
 
+const MainTitle = styled.h1`
+  font-size: 3rem;
+  font-weight: 800;
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+`;
+
+const MainParagraph = styled.p`
+  font-size: 1.25rem;
+  line-height: 1.8;
+  max-width: 800px;
+  margin-bottom: 4rem;
+`;
+
 const Section = styled.section`
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 `;
 
 const SectionTitle = styled.h2`
@@ -38,152 +53,104 @@ const SectionTitle = styled.h2`
   margin-bottom: 1rem;
   border-bottom: 2px solid ${({ theme }) => theme.colors.primary};
   padding-bottom: 0.5rem;
-  text-transform: uppercase;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
 `;
 
-const LargeText = styled.div`
-  font-size: 1.25rem;
+const TopicContainer = styled.div`
+  margin-bottom: 3rem;
+`;
+
+const TopicSubtitle = styled.h3`
+  font-size: 2rem;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.textLight};
-  line-height: 1.8;
-  margin-bottom: 1.5rem;
-
-  & > p {
-    margin: 0;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
+  margin-bottom: 0.75rem;
 `;
 
-// AktheCard Component
-const Card = styled.div<{ $isOpen: boolean }>`
+const TopicParagraph = styled.p`
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: ${({ theme }) => theme.colors.textLight};
+  margin-bottom: 1.5rem;
+`;
+
+// NY KOMPONENT: Lenke-knapp
+const InfoLink = styled(Link)`
+  display: inline-block;
   background: ${({ theme }) => theme.colors.backgroundContent};
+  color: ${({ theme }) => theme.colors.primary};
+  padding: 0.75rem 1.5rem;
   border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1px solid transparent;
   transition: all 0.3s ease;
 
   &:hover {
     background: ${({ theme }) => theme.colors.backgroundLight};
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
 `;
 
-const CardTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0;
-  color: ${({ theme }) => theme.colors.primary};
-`;
-
-const CardDescription = styled.div<{ $isOpen: boolean }>`
-  font-size: 1rem;
-  color: ${({ theme }) => theme.colors.textLight};
-  line-height: 1.6;
-  margin-top: ${({ $isOpen }) => ($isOpen ? "1rem" : "0")};
-  max-height: ${({ $isOpen }) => ($isOpen ? "1000px" : "0")};
-  overflow: hidden;
-  transition: all 0.3s ease;
-
-  & > p {
-    margin: 0;
-  }
-`;
-
-const AktheCard: React.FC<{
-  title: string;
-  description: string;
-  isOpen: boolean;
-  onToggle: () => void;
-}> = ({ title, description, isOpen, onToggle }) => {
-  return (
-    <Card $isOpen={isOpen} onClick={onToggle}>
-      <CardTitle>{title}</CardTitle>
-      <CardDescription $isOpen={isOpen}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{description}</ReactMarkdown>
-      </CardDescription>
-    </Card>
-  );
-};
-
-// Main Component
+// Hovedkomponent
 export default function Akthe() {
-  const [openCards, setOpenCards] = useState<{ [key: number]: boolean }>({});
-
-  const toggleCard = (index: number) => {
-    setOpenCards((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
-
-  const sections = [
+  const aktheInitiatives = [
     {
-      title: "AKTHE - Activity-Based Healthcare",
-      largeText:
-        "Aktivitetsbasert Helsehjelp (AKTHE), established on January 1, 2022, is a division dedicated to mental health, substance abuse support, tailored housing, and acute services in Bærum. Our mission is to provide health-promoting activities that foster recovery, prevent exclusion, and empower individuals to master their chosen pursuits—be it social connection, work training, employment, or skill development.\n\nRooted in recovery-oriented principles, Supported Employment, IPS, and lived experience, AKTHE operates through social entrepreneurship. Our projects are co-created with public and private partners to deliver meaningful activities and job opportunities.",
-      cards: [
-        {
-          title: "Studio 51 / Rap Clinic",
-          description:
-            "A music-based initiative to reconnect individuals with music and social bonds, promoting recovery through creative expression with the motto *‘Beats for Recovery.’* Since 2016, Studio 51 has grown into a vibrant community in Sandvika, offering house music workshops, recording sessions, and live events to support mental health and substance abuse recovery.",
-        },
-        {
-          title: "Høl i CV-en",
-          description:
-            "A user-driven program featuring a café, coffee roastery, and food truck, empowering participants to build positive identities through meaningful work. *‘It’s about filling gaps with purpose,’* says a participant. Høl i CV-en provides practical skills and social engagement, helping individuals re-enter the workforce.",
-        },
-        {
-          title: "The Music Truck",
-          description:
-            "A mobile music therapy service using music to express thoughts and emotions, enhancing quality of life for participants. Deployed across Bærum, it brings house beats and creative outlets to those in need, offering *‘a studio on wheels’* for recovery and connection.",
-        },
-        {
-          title: "DSA Groups",
-          description:
-            "A work program for individuals on the autism spectrum, offering practical tasks in nature and collaboration with public partners. *‘Nature and teamwork gave me focus,’* shares a member. DSA Groups combine activity-based support with skill-building in a supportive environment.",
-        },
-        {
-          title: "Bjørnegård Health Center",
-          description:
-            "A modern health center in Bærum offering a wide range of services, from prevention to rehabilitation, with a multidisciplinary team focused on holistic care. Integrated with AKTHE, it supports Studio 51 and other projects by providing health resources and activity spaces.",
-        },
-      ],
+      subtitle: "Studio 51 / Rap Clinic",
+      visible_description: "Et musikkbasert initiativ for å koble individer på nytt med musikk og sosiale bånd, som fremmer mestring gjennom kreativt uttrykk. Siden 2016 har Studio 51 vokst til et levende fellesskap i Sandvika.",
+      link_text: "Besøk Nettsiden",
+      link_url: "https://rapclinic.no/",
+    },
+    {
+      subtitle: "Høl i CV-en",
+      visible_description: "Et brukerstyrt program med kafé, kaffebrenneri og 'food truck', som gir deltakerne mulighet til å bygge positive identiteter gjennom meningsfylt arbeid og praktiske ferdigheter.",
+      link_text: "Les Mer hos Bærum Kommune",
+      link_url: "https://www.baerum.kommune.no/tjenester/helse-og-omsorg/psykisk-helse-og-rus/aktivitetsbasert-helsehjelp-akthe/",
+    },
+    {
+      subtitle: "Music Truck",
+      visible_description: "En mobil musikkterapitjeneste som bruker musikk til å uttrykke tanker og følelser. Den ruller rundt i Bærum og tilbyr et 'studio på hjul' for mestring og tilknytning.",
+      link_text: "Les Mer hos Bærum Kommune",
+      link_url: "https://www.baerum.kommune.no/tjenester/helse-og-omsorg/psykisk-helse-og-rus/aktivitetsbasert-helsehjelp-akthe/",
+    },
+    {
+      subtitle: "DSA-gruppene",
+      visible_description: "Et arbeidsprogram for personer på autismespekteret, som tilbyr praktiske oppgaver i naturen og samarbeid med offentlige partnere i et trygt og støttende miljø.",
+      link_text: "Les Mer hos Bærum Kommune",
+      link_url: "https://www.baerum.kommune.no/tjenester/helse-og-omsorg/psykisk-helse-og-rus/aktivitetsbasert-helsehjelp-akthe/",
+    },
+    {
+      subtitle: "Bjørnegård Helsesenter",
+      visible_description: "Et moderne helsesenter som tilbyr et bredt spekter av tjenester, fra forebygging til rehabilitering. Integrert med AKTHE, støtter det prosjekter ved å tilby helseressurser og aktivitetsrom.",
+      link_text: "Besøk Nettsiden",
+      link_url: "https://www.baerum.kommune.no/tjenester/helse-og-omsorg/helsestasjoner-og-sentre/bjornegard-helsesenter/",
     },
   ];
 
   return (
     <PageContainer>
       <ContentContainer>
-        {sections.map((section, sectionIndex) => (
-          <Section key={sectionIndex}>
-            <SectionTitle>{section.title}</SectionTitle>
-            {section.largeText && (
-              <LargeText>
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {section.largeText}
-                </ReactMarkdown>
-              </LargeText>
-            )}
-            {section.cards.map((card, cardIndex) => {
-              const globalIndex = sectionIndex * 100 + cardIndex;
+        <MainTitle>AKTHE - Aktivitetsbasert Helsehjelp</MainTitle>
+        <MainParagraph>
+          Aktivitetsbasert Helsehjelp (AKTHE), etablert 1. januar 2022, er en avdeling dedikert til psykisk helse, rusomsorg, tilpassede botilbud og akutte tjenester i Bærum. Vårt oppdrag er å tilby helsefremmende aktiviteter som fremmer recovery, forhindrer utenforskap og gir enkeltpersoner mulighet til å mestre sine valgte sysler.
+        </MainParagraph>
+
+        <Section>
+          <SectionTitle>Våre Initiativer</SectionTitle>
+            {aktheInitiatives.map((topic, topicIndex) => {
               return (
-                <AktheCard
-                  key={globalIndex}
-                  title={card.title}
-                  description={card.description}
-                  isOpen={!!openCards[globalIndex]}
-                  onToggle={() => toggleCard(globalIndex)}
-                />
+                <TopicContainer key={topicIndex}>
+                  <TopicSubtitle>{topic.subtitle}</TopicSubtitle>
+                  <TopicParagraph>{topic.visible_description}</TopicParagraph>
+                  <InfoLink href={topic.link_url} target="_blank" rel="noopener noreferrer">
+                    {topic.link_text}
+                  </InfoLink>
+                </TopicContainer>
               );
             })}
-          </Section>
-        ))}
+        </Section>
       </ContentContainer>
     </PageContainer>
   );
